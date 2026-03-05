@@ -12,6 +12,12 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "OpenAI API key not found" });
     }
 
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message missing" });
+    }
+
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -20,7 +26,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        input: req.body.message
+        input: message
       })
     });
 
@@ -30,7 +36,9 @@ export default async function handler(req, res) {
       data.output?.[0]?.content?.[0]?.text ||
       "AI response error";
 
-    return res.status(200).json({ reply });
+    return res.status(200).json({
+      reply: reply
+    });
 
   } catch (error) {
 
